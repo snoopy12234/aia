@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pinterest-Style Gallery with Music</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fafafa;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 1.8rem;
+    }
+
+    .music-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .button-row button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      background-color: #efefef;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    .button-row button:hover {
+      background-color: #ddd;
+    }
+
+    .now-playing {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .music-bars {
+      display: flex;
+      gap: 4px;
+      height: 20px;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    .bar {
+      width: 4px;
+      height: 10px;
+      background: #888;
+      animation: bounce 1s infinite ease-in-out;
+      animation-play-state: paused;
+    }
+
+    .bar:nth-child(1) { animation-delay: 0s; }
+    .bar:nth-child(2) { animation-delay: 0.1s; }
+    .bar:nth-child(3) { animation-delay: 0.2s; }
+    .bar:nth-child(4) { animation-delay: 0.3s; }
+    .bar:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 100% { height: 10px; }
+      50% { height: 20px; }
+    }
+
+    .grid {
+      column-count: 3;
+      column-gap: 20px;
+    }
+
+    .grid img {
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .grid img:hover {
+      transform: scale(1.03);
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content img {
+      max-width: 300px;
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .message-box {
+      max-width: 300px;
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #333;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    /* MOBILE RESPONSIVE ADJUSTMENTS */
+    @media (max-width: 1024px) {
+      .grid {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        column-count: 1;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      .message-box {
+        text-align: center;
+      }
+
+      .modal-content {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .button-row {
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .now-playing {
+        font-size: 12px;
+      }
+
+      .music-bars {
+        height: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📌 Press the images. Play the song before u do!</h1>
+
+  <div class="music-controls">
+    <div class="now-playing">Now Playing: <em>Kay Ganda Mo.mp3</em></div>
+    <div class="music-bars">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="button-row">
+      <button onclick="playMusic()">▶ Play</button>
+      <button onclick="pauseMusic()">⏸ Pause</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" src="song.mp3" loop></audio>
+
+  <div class="grid">
+    <img src="1.jpg" alt="Image 1" data-message="Akin ka, ako'y sa 'yo
+Kay ganda mong pagmasdan
+Oh, sinta, napukaw mo
+Aking mata">
+    <img src="2.jpg" alt="Image 2" data-message="Hindi mo na kailangan pa na sumayaw, magsalita
+Isang sulyap mo lang, ako'y nabihag na
+'Di mo kailangang magsalita
+Sa pagdating mo, sinta">
+    <img src="3.jpg" alt="Image 3" data-message="Parang umagang maliwanag
+Ang tinig mo ay kay ganda
+'Di mo kailangang magsalita
+Ako'y iyo, ika'y akin">
+    <img src="4.jpg" alt="Image 4" data-message="Kay sarap mong kapiling
+'Di ko na palalampasin
+Ating gabi
+Hindi mo na kailangan pa na sumayaw, magsalita">
+    <img src="5.jpg" alt="Image 5" data-message="Isang sulyap mo lang, ako'y nabihag na
+'Di mo kailangang magsalita
+Sa pagdating mo, sinta
+Parang umagang maliwanag">
+    <img src="6.jpg" alt="Image 6" data-message="Ang tinig mo ay kay ganda
+'Di mo kailangang magsalita">
+</div>
+
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img id="modalImage" src="" alt="Popup Image">
+      <div class="message-box" id="modalMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    const images = document.querySelectorAll('.grid img');
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalMsg = document.getElementById('modalMessage');
+    const bgMusic = document.getElementById('bgMusic');
+    const bars = document.querySelectorAll('.bar');
+
+    images.forEach(img => {
+      img.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        modalImg.src = img.src;
+        modalMsg.textContent = img.dataset.message;
+      });
+    });
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    window.addEventListener('click', e => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    function playMusic() {
+      bgMusic.play();
+      bars.forEach(bar => {
+        bar.style.animationPlayState = 'running';
+      });
+    }
+
+    function pauseMusic() {
+      bgMusic.pause();
+      bars.forEach(bar => {
+        bar.style.animationPlayState = 'paused';
+      });
+    }
+  </script>
+</body>
+</html>
